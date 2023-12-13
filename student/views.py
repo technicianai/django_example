@@ -27,13 +27,14 @@ class CreateEnrollmentView(CreateAPIView):
         if not(request.data.get('student') and request.data.get('course')):
             return Response('student and course are required')
         
-        enrollment = Enrollment.objects.get(
-            student_id=request.data.get('student'),
-            course_id=request.data.get('course')
-        )
-
-        if enrollment:
+        try:
+            enrollment = Enrollment.objects.get(
+                student_id=request.data.get('student'),
+                course_id=request.data.get('course')
+            )
             return Response('student is already enrolled in course')
+        except Enrollment.DoesNotExist:
+            pass
 
         serializer = EnrollmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
